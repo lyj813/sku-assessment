@@ -1,0 +1,85 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '2.1.5.RELEASE'
+}
+
+ext {
+    assessmentVersion = '3.0.0-SNAPSHOT'
+
+    accentVersion = "3.0.2-SNAPSHOT"
+    sharedVersion = "3.0.0-SNAPSHOT"
+    stageEnvoyVersion = "3.0.0-SNAPSHOT"
+
+    springBootVersion = "2.1.5.RELEASE"
+    springCloudVersion = "Greenwich.RELEASE"
+    springCloudStreamVersion = "Greenwich.RELEASE"
+
+    lettuceVersion = "5.2.1.RELEASE"
+
+    lombokVersion = "1.18.10"
+    swaggerVersion = "2.9.2"
+}
+
+ext["log4j2.version"] = "2.17.0"
+ext["logback.version"] = "1.2.9"
+
+allprojects {
+    group 'sk.university'
+    version assessmentVersion
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'maven-publish'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    repositories {
+        maven {
+            credentials {
+                username = 'ski-mysuni-deploy'
+                password = 'Qwer1234!!'
+            }
+            url 'https://mysuni-nexus.mysuni.cloudzcp.net/repository/maven-ski-mysuni-group/'
+        }
+        mavenLocal()
+        jcenter()
+    }
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+    dependencies {
+        api("io.naraplatform:accent:${accentVersion}")
+        implementation("sk.university:sku-shared:${sharedVersion}")
+
+        compileOnly("org.projectlombok:lombok:${lombokVersion}")
+        annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+        testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+        testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    }
+    publishing {
+        repositories {
+            maven {
+                credentials {
+                    username = 'ski-mysuni-deploy'
+                    password = 'Qwer1234!!'
+                }
+                def releasesRepoUrl = 'https://mysuni-nexus.mysuni.cloudzcp.net/repository/maven-ski-mysuni-releases/'
+                def snapshotsRepoUrl = 'https://mysuni-nexus.mysuni.cloudzcp.net/repository/maven-ski-mysuni-snapshots/'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            }
+        }
+    }
+}
+

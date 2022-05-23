@@ -1,0 +1,26 @@
+dependencies {
+    api project(':assessment-spec')
+
+    implementation("io.naraplatform:stage-envoy:${stageEnvoyVersion}")
+
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+
+    implementation("javax.servlet:javax.servlet-api")
+    implementation('org.projectreactor:reactor-spring:1.0.1.RELEASE')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId group
+            artifactId project.name
+            version version
+
+            from components.java
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}

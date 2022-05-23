@@ -1,0 +1,64 @@
+plugins {
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+}
+
+dependencies {
+    api project(':assessment-spec')
+    api project(':assessment-client')
+
+    implementation("io.naraplatform:stage-envoy:${stageEnvoyVersion}")
+
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+    implementation('org.springframework.boot:spring-boot-starter-data-redis-reactive')
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    implementation('org.mariadb.jdbc:mariadb-java-client')
+    implementation('javax.transaction:javax.transaction-api:1.3')
+    implementation('org.jsoup:jsoup:1.14.3')
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
+
+    implementation('com.querydsl:querydsl-core')
+    implementation('com.querydsl:querydsl-jpa')
+    compileOnly('com.querydsl:querydsl-apt')
+    implementation("io.lettuce:lettuce-core:${lettuceVersion}")
+}
+
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
+
+// querydsl 설정
+def querydslDir = "$buildDir/generated/querydsl/" // QClass 생성 위치
+
+querydsl {
+//    library = "com.querydsl:querydsl-apt"
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+    querydsl.extendsFrom compileClasspath
+
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}

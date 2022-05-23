@@ -1,0 +1,25 @@
+dependencies {
+    implementation("org.springframework:spring-beans")
+    implementation("org.springframework:spring-web")
+
+    implementation("javax.servlet:javax.servlet-api")
+    implementation("com.fasterxml.jackson.core:jackson-annotations")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId group
+            artifactId project.name
+            version version
+
+            from components.java
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
+
+
